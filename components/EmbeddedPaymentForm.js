@@ -88,6 +88,7 @@ const EmbeddedPaymentForm = () => {
       {canMakePayment && paymentRequest && (
         <div style={{ marginBottom: '20px' }}>
           <PaymentRequestButtonElement options={{ paymentRequest }} />
+          <h3 style={{color:'black'}}>Heelo berrro</h3>
         </div>
       )}
       <form onSubmit={handleSubmit}>
