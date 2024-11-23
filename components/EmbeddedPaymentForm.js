@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { CardElement, useStripe, useElements, PaymentRequestButtonElement } from '@stripe/react-stripe-js';
+import React, { useState, useEffect } from "react";
+import { useStripe, useElements, PaymentRequestButtonElement } from "@stripe/react-stripe-js";
 
 const EmbeddedPaymentForm = () => {
   const stripe = useStripe();
@@ -9,23 +9,26 @@ const EmbeddedPaymentForm = () => {
 
   const [paymentRequest, setPaymentRequest] = useState(null);
   const [canMakePayment, setCanMakePayment] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvc, setCvc] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
     if (stripe) {
       const pr = stripe.paymentRequest({
-        country: 'US',
-        currency: 'usd',
+        country: "US",
+        currency: "usd",
         total: {
-          label: 'Total',
+          label: "Total",
           amount: 8800, // $88.00 in cents
         },
         requestPayerName: true,
         requestPayerEmail: true,
       });
 
+      // Check if Google Pay is available
       pr.canMakePayment().then((result) => {
         if (result) {
           setPaymentRequest(pr);
@@ -33,17 +36,16 @@ const EmbeddedPaymentForm = () => {
         }
       });
 
-      pr.on('paymentmethod', async (event) => {
+      pr.on("paymentmethod", async (event) => {
         setIsProcessing(true);
         try {
-          // You need to send event.paymentMethod.id to your server for further processing
-          // For this example, we'll just simulate success
-          event.complete('success');
-          alert('Payment Successful!');
+          // Send the event.paymentMethod.id to your server for processing
+          event.complete("success");
+          alert("Google Pay Payment Successful!");
         } catch (error) {
           console.error(error);
-          event.complete('fail');
-          setErrorMessage('Payment failed. Please try again.');
+          event.complete("fail");
+          setErrorMessage("Google Pay Payment failed. Please try again.");
         } finally {
           setIsProcessing(false);
         }
@@ -54,60 +56,81 @@ const EmbeddedPaymentForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!stripe || !elements) {
-      console.error('Stripe has not loaded yet.');
-      return;
-    }
-
-    const cardElement = elements.getElement(CardElement);
-    if (!cardElement) {
-      console.error('CardElement not found.');
+      console.error("Stripe has not loaded yet.");
       return;
     }
 
     setIsProcessing(true);
 
-    const { error, paymentMethod } = await stripe.createPaymentMethod({
-      type: 'card',
-      card: cardElement,
-      billing_details: {
-        name: cardName,
-      },
-    });
+    try {
+      const { token, error } = await stripe.createToken({
+        card: {
+          number: cardNumber,
+          exp_month: expiry.split("/")[0],
+          exp_year: expiry.split("/")[1],
+          cvc,
+        },
+      });
 
-    if (error) {
-      setErrorMessage(error.message);
-    } else {
-      alert('Payment Successful!');
+      if (error) {
+        setErrorMessage(error.message);
+      } else {
+        alert(`Payment Successful! Token: ${token.id}`);
+        // Send the token to your server for further processing
+      }
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Payment failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
     }
-
-    setIsProcessing(false);
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: 'auto', padding: '20px', background: '#f9f9f9', borderRadius: '8px' }}>
+    <div style={{ maxWidth: "400px", margin: "auto", padding: "20px", background: "#f9f9f9", borderRadius: "8px" }}>
       {canMakePayment && paymentRequest && (
-        <div style={{ marginBottom: '20px' }}>
+        <div style={{ marginBottom: "20px" }}>
+          <h4>Pay with Google Pay:</h4>
           <PaymentRequestButtonElement options={{ paymentRequest }} />
-          <h3 style={{color:'black'}}>Heelo berrro</h3>
         </div>
       )}
       <form onSubmit={handleSubmit}>
-        <label>
-          Name on Card:
+        <label style={{color:'black'}}>
+          Card Number:
           <input
             type="text"
-            value={cardName}
-            onChange={(e) => setCardName(e.target.value)}
+            value={cardNumber}
+            onChange={(e) => setCardNumber(e.target.value)}
+            placeholder="4242 4242 4242 4242"
             required
-            style={{ marginBottom: '10px', padding: '8px', width: '100%' }}
+            style={{ marginBottom: "10px", padding: "8px", width: "100%" }}
           />
         </label>
-        <div style={{ padding: '10px', border: '1px solid #ccc', borderRadius: '4px', marginBottom: '10px' }}>
-          <CardElement />
-        </div>
-        {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
-        <button type="submit" disabled={isProcessing || !stripe} style={{ padding: '10px', width: '100%' }}>
-          {isProcessing ? 'Processing...' : 'Pay $88'}
+        <label style={{color:'black'}}>
+          Expiration (MM/YY):
+          <input
+            type="text"
+            value={expiry}
+            onChange={(e) => setExpiry(e.target.value)}
+            placeholder="MM/YY"
+            required
+            style={{ marginBottom: "10px", padding: "8px", width: "100%" }}
+          />
+        </label>
+        <label style={{color:'black'}}>
+          CVC:
+          <input
+            type="text"
+            value={cvc}
+            onChange={(e) => setCvc(e.target.value)}
+            placeholder="123"
+            required
+            style={{ marginBottom: "10px", padding: "8px", width: "100%" }}
+          />
+        </label>
+        {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+        <button type="submit"  disabled={isProcessing || !stripe} style={{ padding: "10px", width: "100%" ,backgroundColor:'blue'}}>
+          {isProcessing ? "Processing..." : "Pay $88"}
         </button>
       </form>
     </div>
