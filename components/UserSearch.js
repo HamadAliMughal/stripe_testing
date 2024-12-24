@@ -172,19 +172,15 @@
 // export default EmbeddedPaymentForm;
 
 
-
 "use client";
 
-
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-// Utility function
 const calculateNewDate = (dateString) => {
   const date = new Date(dateString);
-  date.setDate(date.getDate() + 30); // Example: Adding 30 days
-  return date.toISOString().split("T")[0]; // Format date as YYYY-MM-DD
+  date.setDate(date.getDate() + 30);
+  return date.toISOString().split("T")[0];
 };
 
 const hasCancelDateCome = (dateString) => {
@@ -224,25 +220,21 @@ const UserSearch = () => {
       }
 
       const data = await response.json();
-      setUserData(data); // Save raw response for debugging or other uses
+      setUserData(data);
 
-      // Extract CTA details of the first subscription if available
-      const firstSubscription = data[0]; // Get the first subscription
+      const firstSubscription = data[0];
       const firstCtaDetails = firstSubscription?.cta_details || [];
-
-      // Check if cancel date has come
       const startDate = firstSubscription?.start_date;
       const canShowCancelButton = startDate
         ? hasCancelDateCome(startDate)
         : false;
 
-      // Filter CTA details based on cancel logic
       const updatedCtaDetails = firstCtaDetails.map((cta) => {
         if (cta.ctaBtn === "Cancel" && !canShowCancelButton) {
-          return null; // Exclude Cancel button if condition fails
+          return null;
         }
         return cta;
-      }).filter(Boolean); // Remove null values
+      }).filter(Boolean);
 
       setCtaDetails(updatedCtaDetails);
     } catch (err) {
@@ -250,148 +242,60 @@ const UserSearch = () => {
     }
   };
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     if (!userId.trim()) {
       setError("Please enter a valid user ID");
       return;
     }
 
-    setError(""); // Clear previous errors
-    setUserData(null); // Clear previous data
-    setCtaDetails([]); // Clear previous CTA details
-    router.push(`?user_id=${userId}`); // Update the query string
+    setError("");
+    setUserData(null);
+    setCtaDetails([]);
+    router.push(`?user_id=${userId}`);
     fetchUserData(userId);
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "white",
-        padding: "20px",
-        color: "black",
-        borderRadius: "8px",
-        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-        maxWidth: "600px",
-        margin: "0 auto",
-      }}
-    >
-      <h3 style={{ textAlign: "center", color: "black" }}>
-        Search The User Data Here
-      </h3>
-      <div style={{ marginBottom: "10px" }}>
+    <div>
+      <h3>Search The User Data Here</h3>
+      <div>
         <input
           type="text"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
           placeholder="Enter User ID"
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "10px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-            color: "black",
-          }}
         />
-        <button
-          onClick={handleSearch}
-          style={{
-            width: "100%",
-            padding: "10px",
-            backgroundColor: "#0070f3",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          Search
-        </button>
+        <button onClick={handleSearch}>Search</button>
       </div>
-      {error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
-      )}
-
+      {error && <div>{error}</div>}
       {ctaDetails.length > 0 ? (
-        <div>
-          <h4>CTA Details of Latest Subscription</h4>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              marginBottom: "10px",
-            }}
-          >
-            <thead>
-              <tr>
-                <th
-                  style={{
-                    border: "1px solid #ccc",
-                    padding: "8px",
-                    textAlign: "left",
-                  }}
-                >
-                  Button
-                </th>
-                <th
-                  style={{
-                    border: "1px solid #ccc",
-                    padding: "8px",
-                    textAlign: "left",
-                  }}
-                >
-                  Action
-                </th>
+        <table>
+          <thead>
+            <tr>
+              <th>Button</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ctaDetails.map((cta, index) => (
+              <tr key={index}>
+                <td>{cta.ctaBtn}</td>
+                <td>{cta.ctaAction}</td>
               </tr>
-            </thead>
-            <tbody>
-              {ctaDetails.map((cta, index) => (
-                <tr key={index}>
-                  <td
-                    style={{
-                      border: "1px solid #ccc",
-                      padding: "8px",
-                    }}
-                  >
-                    {cta.ctaBtn}
-                  </td>
-                  <td
-                    style={{
-                      border: "1px solid #ccc",
-                      padding: "8px",
-                    }}
-                  >
-                    {cta.ctaAction}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       ) : (
-        <p style={{ textAlign: "center", color: "gray" }}>
-          No button should display
-        </p>
+        <p>No button should display</p>
       )}
-<h3>The JSON Response of API: </h3>
-      <textarea
-        readOnly
-        value={userData ? JSON.stringify(userData, null, 2) : ""}
-        style={{
-          width: "100%",
-          height: "200px",
-          padding: "10px",
-          borderRadius: "4px",
-          border: "1px solid #ccc",
-          color: "black",
-        }}
-        placeholder="User data will appear here..."
-      />
     </div>
   );
 };
 
-export default UserSearch;
-
-
-
+export default function UserSearchPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UserSearch />
+    </Suspense>
+  );
+}
