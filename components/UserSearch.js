@@ -256,39 +256,131 @@ const UserSearch = () => {
   };
 
   return (
-    <div>
-      <h3>Search The User Data Here</h3>
-      <div>
+    <div
+      style={{
+        backgroundColor: "white",
+        padding: "20px",
+        color: "black",
+        borderRadius: "8px",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+        maxWidth: "600px",
+        margin: "0 auto",
+      }}
+    >
+      <h3 style={{ textAlign: "center", color: "black" }}>
+        Search The User Data Here
+      </h3>
+      <div style={{ marginBottom: "10px" }}>
         <input
           type="text"
           value={userId}
           onChange={(e) => setUserId(e.target.value)}
           placeholder="Enter User ID"
+          style={{
+            width: "100%",
+            padding: "10px",
+            marginBottom: "10px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            color: "black",
+          }}
         />
-        <button onClick={handleSearch}>Search</button>
+        <button
+          onClick={handleSearch}
+          style={{
+            width: "100%",
+            padding: "10px",
+            backgroundColor: "#0070f3",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Search
+        </button>
       </div>
-      {error && <div>{error}</div>}
-      {ctaDetails.length > 0 ? (
-        <table>
-          <thead>
-            <tr>
-              <th>Button</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ctaDetails.map((cta, index) => (
-              <tr key={index}>
-                <td>{cta.ctaBtn}</td>
-                <td>{cta.ctaAction}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>No button should display</p>
+      {error && (
+        <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
       )}
+
+      {ctaDetails.length > 0 ? (
+        <div>
+          <h4>CTA Details of First Subscription</h4>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              marginBottom: "10px",
+            }}
+          >
+            <thead>
+              <tr>
+                <th
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    textAlign: "left",
+                  }}
+                >
+                  Button
+                </th>
+                <th
+                  style={{
+                    border: "1px solid #ccc",
+                    padding: "8px",
+                    textAlign: "left",
+                  }}
+                >
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {ctaDetails.map((cta, index) => (
+                <tr key={index}>
+                  <td
+                    style={{
+                      border: "1px solid #ccc",
+                      padding: "8px",
+                    }}
+                  >
+                    {cta.ctaBtn}
+                  </td>
+                  <td
+                    style={{
+                      border: "1px solid #ccc",
+                      padding: "8px",
+                    }}
+                  >
+                    {cta.ctaAction}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <p style={{ textAlign: "center", color: "gray" }}>
+          No button should display
+        </p>
+      )}
+
+      <textarea
+        readOnly
+        value={userData ? JSON.stringify(userData, null, 2) : ""}
+        style={{
+          width: "100%",
+          height: "200px",
+          padding: "10px",
+          borderRadius: "4px",
+          border: "1px solid #ccc",
+          color: "black",
+        }}
+        placeholder="User data will appear here..."
+      />
     </div>
+
   );
 };
 
