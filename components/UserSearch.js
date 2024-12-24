@@ -176,7 +176,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import Subscriptionbox from './Subscription';
 const calculateNewDate = (dateString) => {
   const date = new Date(dateString);
   date.setDate(date.getDate() + 30);
@@ -199,6 +199,7 @@ const UserSearch = () => {
   const [userId, setUserId] = useState("");
   const [userData, setUserData] = useState(null);
   const [ctaDetails, setCtaDetails] = useState([]);
+  const [mainData, setMainData]=useState(null)
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -221,7 +222,7 @@ const UserSearch = () => {
 
       const data = await response.json();
       setUserData(data);
-
+        
       const firstSubscription = data[0];
       const firstCtaDetails = firstSubscription?.cta_details || [];
       const startDate = firstSubscription?.start_date;
@@ -256,14 +257,15 @@ const UserSearch = () => {
   };
 
   return (
+    <>
     <div
       style={{
         backgroundColor: "white",
-        padding: "20px",
+      
         color: "black",
         borderRadius: "8px",
         boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
-        maxWidth: "600px",
+        maxWidth: "900px",
         margin: "0 auto",
       }}
     >
@@ -282,6 +284,7 @@ const UserSearch = () => {
             marginBottom: "10px",
             borderRadius: "4px",
             border: "1px solid #ccc",
+            background:'white',
             color: "black",
           }}
         />
@@ -312,6 +315,7 @@ const UserSearch = () => {
               width: "100%",
               borderCollapse: "collapse",
               marginBottom: "10px",
+              background:'#4ad259ed',
             }}
           >
             <thead>
@@ -343,6 +347,7 @@ const UserSearch = () => {
                     style={{
                       border: "1px solid #ccc",
                       padding: "8px",
+                      textAlign:'left'
                     }}
                   >
                     {cta.ctaBtn}
@@ -351,6 +356,7 @@ const UserSearch = () => {
                     style={{
                       border: "1px solid #ccc",
                       padding: "8px",
+                      textAlign:'left'
                     }}
                   >
                     {cta.ctaAction}
@@ -365,7 +371,10 @@ const UserSearch = () => {
           No button should display
         </p>
       )}
+     <Subscriptionbox data={userData}/>
 
+<br></br>
+     <h4>The API response: </h4>
       <textarea
         readOnly
         value={userData ? JSON.stringify(userData, null, 2) : ""}
@@ -380,6 +389,9 @@ const UserSearch = () => {
         placeholder="User data will appear here..."
       />
     </div>
+     
+      </>
+
 
   );
 };
