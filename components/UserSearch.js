@@ -270,7 +270,7 @@ const UserSearch = () => {
       }}
     >
       <h3 style={{ textAlign: "center", color: "black" }}>
-        Search The User Data Here
+        Search User Data Here
       </h3>
       <div style={{ marginBottom: "10px" }}>
         <input
@@ -309,7 +309,7 @@ const UserSearch = () => {
 
       {ctaDetails.length > 0 ? (
         <div>
-          <h4>CTA Details of First Subscription</h4>
+          <h4>CTA Details of Subscription</h4>
           <table
             style={{
               width: "100%",
