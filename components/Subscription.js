@@ -245,7 +245,7 @@ const Subscriptionbox = ({ data }) => {
               </div>
               <div className="column-3">
                 <span>Renewal Date</span>
-               {data[0].is_expired? <><p>Last Failed on {data[0].renewal_date}</p></>: <p>{data[0].renewal_date}</p>}
+                <p>{data[0].renewal_date}</p>
               </div>
               <div className="column-4">
                 <Link href="receipts/" className="view-receipt-btn">
