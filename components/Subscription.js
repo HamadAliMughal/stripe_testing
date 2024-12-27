@@ -251,8 +251,8 @@ const Subscriptionbox = ({ data }) => {
                 <Link href="receipts/" className="view-receipt-btn">
                   View Receipts {data[0].can_renew}
                 </Link>
-                {data[0].can_update_payment_method && <a className="add-button" >
-                  Update payment method
+                {data[0].can_update_payment_method && <a className="view-receipt-btn" >
+                  Update Payment Method
                 </a>}
                 {data[0].can_reactivate && <Link href="#" className="view-receipt-btn">
                   {'Restart Subscription'}
