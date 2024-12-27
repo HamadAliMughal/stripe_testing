@@ -179,7 +179,7 @@ const Subscriptionbox = ({ data }) => {
                   </div>
                   <div className="info-content time-wrap">
                     {" "}
-                    Locked intro 12 monthly payments. You can’t make any changes
+                    Locked into 12 monthly payments. You can’t make any changes
                     until <span><b className="exp-date">{calculateNewDate(data[0].start_date)} </b> </span>{" "}
                     <Link
                      href={data[0].renew_url || ""}
