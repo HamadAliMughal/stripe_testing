@@ -231,7 +231,7 @@ const Subscriptionbox = ({ data }) => {
               </div>
               <div className="column-right">
                 <h6> $ {parseAmount(data[0].amount)}</h6>
-                <span>month</span>
+                {data[0].duration==='Year'?<span>year</span>:<span>month</span>}
               </div>
             </div>
             <div className="subscription-item-details">
